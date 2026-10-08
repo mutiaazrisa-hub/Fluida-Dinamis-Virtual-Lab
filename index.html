@@ -1,0 +1,1169 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtual Laboratory Fluida Dinamis - SMA Kelas XI</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ctext y=%27.9em%27 font-size=%2790%27%3E%F0%9F%92%A7%3C/text%3E%3C/svg%3E">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="js/config.js"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- MathJax 3: render mathematical notation as proper equations -->
+    <!-- (konfigurasi MathJax ada di js/config.js) -->
+    <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+    <!-- FontAwesome CDN for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Gaya kustom -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-sky-500 selection:text-white">
+
+    <!-- Navigation Bar -->
+    <header class="sticky top-0 z-50 glass-card border-b border-slate-700/60 no-print">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <!-- Brand Logo -->
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="switchMainTab('beranda')">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-500 to-blue-600 flex items-center justify-center text-white shadow-lg shadow-sky-500/30">
+                    <i class="fa-solid me-0 fa-flask-vial text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg leading-tight bg-gradient-to-r from-sky-400 to-blue-200 bg-clip-text text-transparent">V-Lab Fluida Dinamis</h1>
+                    <p class="text-xs text-slate-400">Fisika SMA Kelas XI</p>
+                </div>
+            </div>
+
+            <!-- Desktop Main Menu Nav -->
+            <nav class="hidden md:flex items-center space-x-1 lg:space-x-2">
+                <button onclick="switchMainTab('beranda')" id="nav-beranda" class="nav-btn px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-house mr-1.5"></i> Beranda
+                </button>
+                <button onclick="switchMainTab('p1')" id="nav-p1" class="nav-btn px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800 transition">
+                    Pertemuan 1: Debit
+                </button>
+                <button onclick="switchMainTab('p2')" id="nav-p2" class="nav-btn px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800 transition">
+                    Pertemuan 2: Kontinuitas
+                </button>
+                <button onclick="switchMainTab('p3')" id="nav-p3" class="nav-btn px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800 transition">
+                    Pertemuan 3: Bernoulli
+                </button>
+                <button onclick="switchMainTab('tantangan')" id="nav-tantangan" class="nav-btn px-3 py-2 rounded-lg text-sm font-medium text-amber-400 hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-trophy mr-1"></i> Tantangan
+                </button>
+                <button onclick="switchMainTab('evaluasi')" id="nav-evaluasi" class="nav-btn px-3 py-2 rounded-lg text-sm font-medium text-emerald-400 hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-list-check mr-1"></i> Evaluasi
+                </button>
+                <button onclick="switchMainTab('laporan')" id="nav-laporan" class="nav-btn px-3 py-2 rounded-lg text-sm font-medium text-purple-400 hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-file-invoice mr-1"></i> Laporan
+                </button>
+            </nav>
+
+            <!-- Utility Controls (Sound & User Profile) -->
+            <div class="flex items-center space-x-3">
+                <button id="soundToggleBtn" onclick="toggleSound()" class="p-2 rounded-lg bg-slate-800 text-slate-300 hover:text-sky-400 hover:bg-slate-700 transition relative" title="Toggle Sound">
+                    <i id="soundIcon" class="fa-solid fa-volume-high text-lg"></i>
+                </button>
+                <button onclick="openProfileModal()" class="px-3 py-1.5 rounded-lg bg-sky-500/10 border border-sky-500/30 text-sky-400 text-xs font-semibold hover:bg-sky-500/20 transition flex items-center gap-2">
+                    <i class="fa-solid fa-user"></i> <span id="headerStudentName">Siswa</span>
+                </button>
+                <!-- Mobile Hamburger Toggle -->
+                <button onclick="toggleMobileMenu()" class="md:hidden p-2 text-slate-300 hover:text-white">
+                    <i class="fa-solid fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Menu Drawer -->
+        <div id="mobileMenu" class="hidden md:hidden border-t border-slate-700 bg-slate-900 px-4 py-3 space-y-2">
+            <button onclick="switchMainTab('beranda'); toggleMobileMenu()" class="w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-slate-200 hover:bg-slate-800">Beranda</button>
+            <button onclick="switchMainTab('p1'); toggleMobileMenu()" class="w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-slate-200 hover:bg-slate-800">Pertemuan 1: Debit Fluida</button>
+            <button onclick="switchMainTab('p2'); toggleMobileMenu()" class="w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-slate-200 hover:bg-slate-800">Pertemuan 2: Asas Kontinuitas</button>
+            <button onclick="switchMainTab('p3'); toggleMobileMenu()" class="w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-slate-200 hover:bg-slate-800">Pertemuan 3: Persamaan Bernoulli</button>
+            <button onclick="switchMainTab('tantangan'); toggleMobileMenu()" class="w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-amber-400 hover:bg-slate-800">Tantangan Eksperimen</button>
+            <button onclick="switchMainTab('evaluasi'); toggleMobileMenu()" class="w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-emerald-400 hover:bg-slate-800">Evaluasi Akhir</button>
+            <button onclick="switchMainTab('laporan'); toggleMobileMenu()" class="w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-purple-400 hover:bg-slate-800">Laporan Praktikum</button>
+        </div>
+    </header>
+
+    <!-- Main Content Viewport -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+        <!-- ================= BERANDA / HOME TAB ================= -->
+        <section id="tab-beranda" class="space-y-8">
+            <!-- Hero Banner -->
+            <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-slate-900 via-sky-950 to-slate-900 p-8 md:p-12 border border-sky-500/20 shadow-2xl">
+                <div class="absolute -right-12 -bottom-12 w-96 h-96 bg-sky-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="max-w-3xl space-y-4 relative z-10">
+                    <span class="inline-block px-3 py-1 rounded-full bg-sky-500/20 border border-sky-400/30 text-sky-300 text-xs font-semibold uppercase tracking-wider">
+                        <i class="fa-solid fa-atom mr-1"></i> Laboratorium Pembelajaran Digital Fisika
+                    </span>
+                    <h2 class="text-3xl md:text-5xl font-extrabold text-white tracking-tight leading-tight">
+                        Eksplorasi Perilaku Fluida Dinamis Secara <span class="bg-gradient-to-r from-sky-400 to-cyan-300 bg-clip-text text-transparent">Interaktif & Real-Time</span>
+                    </h2>
+                    <p class="text-slate-300 text-base md:text-lg leading-relaxed">
+                        Selamat datang di <strong>Virtual Laboratory Fluida Dinamis</strong>! Media praktikum virtual berbasis inkuiri terbimbing untuk menguji konsep debit fluida, asas kontinuitas, hingga hukum Bernoulli dengan simulasi visual presisi tinggi.
+                    </p>
+                    <div class="pt-4 flex flex-wrap gap-4">
+                        <button onclick="switchMainTab('p1')" class="px-6 py-3 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 text-white font-semibold shadow-lg shadow-sky-500/30 hover:from-sky-400 hover:to-blue-500 transition flex items-center gap-2">
+                            Mulai Praktikum Pertemuan 1 <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                        <button onclick="openProfileModal()" class="px-6 py-3 rounded-xl bg-slate-800 text-slate-200 font-semibold border border-slate-700 hover:bg-slate-700 transition">
+                            <i class="fa-solid fa-id-card mr-2"></i> Isi Identitas Siswa
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Learning Objectives & Features Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="glass-card glass-card-interactive p-6 rounded-2xl border border-slate-700/60">
+                    <div class="w-12 h-12 rounded-xl bg-sky-500/20 border border-sky-500/30 text-sky-400 flex items-center justify-center text-2xl mb-4">
+                        <i class="fa-solid fa-faucet-drip"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-2">1. Debit Fluida ($Q$)</h3>
+                    <p class="text-slate-300 text-sm leading-relaxed mb-4">
+                        Pelajari hubungan volume air, waktu tempuh, luas penampang pipa, dan kecepatan laju fluida. Hitung debit secara konseptual dan eksperimental.
+                    </p>
+                    <button onclick="switchMainTab('p1')" class="text-sky-400 hover:text-sky-300 font-semibold text-sm flex items-center gap-1">
+                        Buka Praktikum 1 <i class="fa-solid fa-chevron-right text-xs"></i>
+                    </button>
+                </div>
+
+                <div class="glass-card glass-card-interactive p-6 rounded-2xl border border-slate-700/60">
+                    <div class="w-12 h-12 rounded-xl bg-blue-500/20 border border-blue-500/30 text-blue-400 flex items-center justify-center text-2xl mb-4">
+                        <i class="fa-solid fa-water"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-2">2. Asas Kontinuitas</h3>
+                    <p class="text-slate-300 text-sm leading-relaxed mb-4">
+                        Simulasikan aliran air melalui pipa penyempitan. Amati perubahan kelajuan partikel dan bukti hukum kekekalan massa fluida $A_1 v_1 = A_2 v_2$.
+                    </p>
+                    <button onclick="switchMainTab('p2')" class="text-blue-400 hover:text-blue-300 font-semibold text-sm flex items-center gap-1">
+                        Buka Praktikum 2 <i class="fa-solid fa-chevron-right text-xs"></i>
+                    </button>
+                </div>
+
+                <div class="glass-card glass-card-interactive p-6 rounded-2xl border border-slate-700/60">
+                    <div class="w-12 h-12 rounded-xl bg-indigo-500/20 border border-indigo-500/30 text-indigo-400 flex items-center justify-center text-2xl mb-4">
+                        <i class="fa-solid fa-gauge-high"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-2">3. Persamaan Bernoulli</h3>
+                    <p class="text-slate-300 text-sm leading-relaxed mb-4">
+                        Analisis konversi energi tekanan, kinetik, dan potensial fluida pada berbagai variasi ketinggian dan penampang secara terpadu.
+                    </p>
+                    <button onclick="switchMainTab('p3')" class="text-indigo-400 hover:text-indigo-300 font-semibold text-sm flex items-center gap-1">
+                        Buka Praktikum 3 <i class="fa-solid fa-chevron-right text-xs"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Workflow Guidance Section -->
+            <div class="glass-card p-6 md:p-8 rounded-2xl border border-slate-700/60 space-y-6">
+                <h3 class="text-2xl font-bold text-white flex items-center gap-3">
+                    <i class="fa-solid fa-route text-sky-400"></i> Alur Pembelajaran Eksperimen Virtual
+                </h3>
+                <div class="grid grid-cols-2 md:grid-cols-6 gap-4 text-center">
+                    <div class="p-4 rounded-xl bg-slate-800/60 border border-slate-700">
+                        <div class="text-sky-400 font-bold text-lg mb-1">01</div>
+                        <div class="text-sm font-semibold text-slate-200">Fenomena</div>
+                        <div class="text-xs text-slate-400 mt-1">Pengamatan kontekstual</div>
+                    </div>
+                    <div class="p-4 rounded-xl bg-slate-800/60 border border-slate-700">
+                        <div class="text-sky-400 font-bold text-lg mb-1">02</div>
+                        <div class="text-sm font-semibold text-slate-200">Prediksi</div>
+                        <div class="text-xs text-slate-400 mt-1">Hipotesis awal</div>
+                    </div>
+                    <div class="p-4 rounded-xl bg-slate-800/60 border border-slate-700">
+                        <div class="text-sky-400 font-bold text-lg mb-1">03</div>
+                        <div class="text-sm font-semibold text-slate-200">Eksperimen</div>
+                        <div class="text-xs text-slate-400 mt-1">Manipulasi & Ukur</div>
+                    </div>
+                    <div class="p-4 rounded-xl bg-slate-800/60 border border-slate-700">
+                        <div class="text-sky-400 font-bold text-lg mb-1">04</div>
+                        <div class="text-sm font-semibold text-slate-200">Grafik & Data</div>
+                        <div class="text-xs text-slate-400 mt-1">Visualisasi data</div>
+                    </div>
+                    <div class="p-4 rounded-xl bg-slate-800/60 border border-slate-700">
+                        <div class="text-sky-400 font-bold text-lg mb-1">05</div>
+                        <div class="text-sm font-semibold text-slate-200">Analisis</div>
+                        <div class="text-xs text-slate-400 mt-1">Uji Hipotesis</div>
+                    </div>
+                    <div class="p-4 rounded-xl bg-slate-800/60 border border-slate-700">
+                        <div class="text-sky-400 font-bold text-lg mb-1">06</div>
+                        <div class="text-sm font-semibold text-slate-200">Kesimpulan</div>
+                        <div class="text-xs text-slate-400 mt-1">Refleksi praktikum</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= PERTEMUAN 1: DEBIT FLUIDA ================= -->
+        <section id="tab-p1" class="hidden space-y-6">
+            <!-- Progress Tracker Bar -->
+            <div class="glass-card p-4 rounded-2xl border border-slate-700/60 flex items-center justify-between overflow-x-auto">
+                <div class="flex items-center space-x-2 min-w-max">
+                    <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-sky-500/20 text-sky-300">Pertemuan 1</span>
+                    <h2 class="text-lg font-bold text-white">Debit Fluida ($Q = V/t = A \cdot v$)</h2>
+                </div>
+                <div class="flex items-center space-x-1 sm:space-x-3 text-xs font-medium text-slate-400 min-w-max ml-4">
+                    <button onclick="scrollToStep('p1-step-fenomena')" class="hover:text-sky-400">1. Fenomena</button> &rarr;
+                    <button onclick="scrollToStep('p1-step-prediksi')" class="hover:text-sky-400">2. Prediksi</button> &rarr;
+                    <button onclick="scrollToStep('p1-step-simulasi')" class="hover:text-sky-400">3. Eksperimen</button> &rarr;
+                    <button onclick="scrollToStep('p1-step-data')" class="hover:text-sky-400">4. Data & Grafik</button> &rarr;
+                    <button onclick="scrollToStep('p1-step-analisis')" class="hover:text-sky-400">5. Analisis</button>
+                </div>
+            </div>
+
+            <!-- Step 1: Fenomena -->
+            <div id="p1-step-fenomena" class="glass-card p-6 rounded-2xl border border-slate-700/60 space-y-4">
+                <div class="flex items-center gap-3 text-sky-400 font-bold text-lg">
+                    <div class="w-8 h-8 rounded-lg bg-sky-500/20 flex items-center justify-center">1</div>
+                    <h3>Fenomena Awal: Pengisian Wadah Penampung Air</h3>
+                </div>
+                <p class="text-slate-300 text-sm leading-relaxed">
+                    Pernahkah Anda menyiram tanaman menggunakan selang air? Ketika ujung selang sedikit ditekan sehingga lubang pengeluaran menyempit, semprotan air terasa lebih cepat. Namun, apakah waktu yang dibutuhkan untuk memenuhi sebuah ember $10\text{ Liter}$ menjadi lebih cepat atau sama saja jika tekanan kran utama tidak diubah? Mari kita selidiki konsep debit fluida!
+                </p>
+            </div>
+
+            <!-- Step 2: Prediksi -->
+            <div id="p1-step-prediksi" class="glass-card p-6 rounded-2xl border border-slate-700/60 space-y-4">
+                <div class="flex items-center gap-3 text-sky-400 font-bold text-lg">
+                    <div class="w-8 h-8 rounded-lg bg-sky-500/20 flex items-center justify-center">2</div>
+                    <h3>Pertanyaan Prediksi (Hipotesis Awal)</h3>
+                </div>
+                <div class="space-y-3 text-sm">
+                    <p class="text-slate-200">Jika luas penampang ujung pipa ($A$) diperbesar sedangkan kecepatan aliran air ($v$) dijaga konstan, bagaimana perubahan laju volume air ($Q$) yang mengalir per satuan waktu?</p>
+                    <div class="space-y-2 text-slate-300">
+                        <label class="flex items-center gap-2 cursor-pointer p-2 rounded-lg bg-slate-800/50 hover:bg-slate-800">
+                            <input type="radio" name="p1_pred" value="A" class="text-sky-500 focus:ring-sky-400">
+                            A. Debit fluida ($Q$) akan semakin besar secara berbanding lurus.
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer p-2 rounded-lg bg-slate-800/50 hover:bg-slate-800">
+                            <input type="radio" name="p1_pred" value="B" class="text-sky-500 focus:ring-sky-400">
+                            B. Debit fluida ($Q$) tetap konstan karena volume tangki tidak berubah.
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer p-2 rounded-lg bg-slate-800/50 hover:bg-slate-800">
+                            <input type="radio" name="p1_pred" value="C" class="text-sky-500 focus:ring-sky-400">
+                            C. Debit fluida ($Q$) akan mengecil karena hambatan pipa meningkat.
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3: Ringkasan Konsep & Eksperimen Simulasi -->
+            <div id="p1-step-simulasi" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Control Panel & Metrics -->
+                <div class="glass-card p-6 rounded-2xl border border-slate-700/60 space-y-5 lg:col-span-1">
+                    <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-sliders text-sky-400"></i> Kontrol Variabel
+                    </h3>
+                    
+                    <!-- Slider Luas Penampang (A) -->
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-sm">
+                            <label class="text-slate-300 font-medium">Luas Penampang ($A$):</label>
+                            <span id="p1_val_A" class="font-bold text-sky-400">10 cm²</span>
+                        </div>
+                        <input type="range" id="p1_slider_A" min="1" max="25" step="0.5" value="10" oninput="updateP1Sim()" class="w-full accent-sky-400 cursor-pointer">
+                        <div class="flex justify-between text-xs text-slate-500">
+                            <span>1 cm²</span>
+                            <span>25 cm²</span>
+                        </div>
+                    </div>
+
+                    <!-- Slider Kecepatan Aliran (v) -->
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-sm">
+                            <label class="text-slate-300 font-medium">Kecepatan Aliran ($v$):</label>
+                            <span id="p1_val_v" class="font-bold text-sky-400">2.0 m/s</span>
+                        </div>
+                        <input type="range" id="p1_slider_v" min="0.5" max="5.0" step="0.1" value="2.0" oninput="updateP1Sim()" class="w-full accent-sky-400 cursor-pointer">
+                        <div class="flex justify-between text-xs text-slate-500">
+                            <span>0.5 m/s</span>
+                            <span>5.0 m/s</span>
+                        </div>
+                    </div>
+
+                    <!-- Real-Time Metrics -->
+                    <div class="pt-2 grid grid-cols-2 gap-3 text-center">
+                        <div class="p-3 rounded-xl bg-slate-800/80 border border-slate-700">
+                            <div class="text-xs text-slate-400">Debit Teoretis ($Q$)</div>
+                            <div id="p1_metric_Q" class="text-base font-extrabold text-sky-300">0.0020 m³/s</div>
+                            <div id="p1_metric_Q_L" class="text-xs text-slate-400">(2.00 L/s)</div>
+                        </div>
+                        <div class="p-3 rounded-xl bg-slate-800/80 border border-slate-700">
+                            <div class="text-xs text-slate-400">Vol. Terkumpul ($V$)</div>
+                            <div id="p1_metric_V" class="text-base font-extrabold text-emerald-400">0.00 L</div>
+                            <div class="text-xs text-slate-400">Stopwatch: <span id="p1_metric_t" class="text-amber-300 font-mono">0.0s</span></div>
+                        </div>
+                    </div>
+
+                    <!-- Simulation Buttons -->
+                    <div class="pt-2 space-y-2">
+                        <div class="grid grid-cols-2 gap-2">
+                            <button id="p1_btn_start" onclick="startP1Sim()" class="py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 font-semibold text-white transition text-sm flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-play"></i> Mulai
+                            </button>
+                            <button id="p1_btn_pause" onclick="pauseP1Sim()" class="py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 font-semibold text-white transition text-sm flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-pause"></i> Jeda
+                            </button>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button onclick="resetP1Sim()" class="py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold border border-slate-700 transition">
+                                <i class="fa-solid fa-rotate-left mr-1"></i> Reset
+                            </button>
+                            <button onclick="recordP1Data()" class="py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-md shadow-emerald-600/30 transition">
+                                <i class="fa-solid fa-plus mr-1"></i> Catat Data
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Simulation Canvas Render -->
+                <div class="glass-card p-6 rounded-2xl border border-slate-700/60 lg:col-span-2 flex flex-col justify-between">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-eye text-sky-400"></i> Visualisasi Tangki & Gelas Ukur
+                        </h3>
+                        <span class="text-xs text-slate-400"><i class="fa-solid fa-info-circle"></i> Air mengalir dari pipa ke wadah penampung</span>
+                    </div>
+                    <!-- Canvas Box -->
+                    <div class="relative w-full h-72 sm:h-80 bg-slate-950 rounded-xl border border-slate-800 overflow-hidden flex items-center justify-center">
+                        <canvas id="p1Canvas" class="w-full h-full block"></canvas>
+                    </div>
+                    <div class="mt-3 text-xs text-slate-400 text-center">
+                        *Persamaan Fisika:<div class="math-display">$$Q=\frac{V}{t}=A\,v$$</div><div class="math-display">$$1\,\mathrm{cm}^2=10^{-4}\,\mathrm{m}^2,\qquad 1\,\mathrm{m}^3=1000\,\mathrm{L}$$</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 4: Data Table & Charts -->
+            <div id="p1-step-data" class="space-y-6">
+                <!-- Table Card -->
+                <div class="glass-card p-6 rounded-2xl border border-slate-700/60 space-y-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-table text-sky-400"></i> Tabel Hasil Pengamatan Debit Fluida
+                        </h3>
+                        <button onclick="clearP1Data()" class="px-3 py-1.5 rounded-lg bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs font-semibold hover:bg-rose-500/20 transition self-start sm:self-auto">
+                            <i class="fa-solid fa-trash mr-1"></i> Hapus Semua Data
+                        </button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs sm:text-sm text-slate-300">
+                            <thead class="bg-slate-800/80 text-sky-400 uppercase text-xs">
+                                <tr>
+                                    <th class="p-3 rounded-l-lg">No</th>
+                                    <th class="p-3">A (cm²)</th>
+                                    <th class="p-3">v (m/s)</th>
+                                    <th class="p-3">t (s)</th>
+                                    <th class="p-3">V Terkumpul (L)</th>
+                                    <th class="p-3">Q Teoretis (m³/s)</th>
+                                    <th class="p-3">Q Eksperimen (m³/s)</th>
+                                    <th class="p-3 rounded-r-lg">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="p1TableBody" class="divide-y divide-slate-800">
+                                <!-- Dynamic Rows -->
+                                <tr>
+                                    <td colspan="8" class="p-4 text-center text-slate-500">Belum ada data dicatat. Jalankan simulasi lalu klik "Catat Data".</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Charts Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="glass-card p-5 rounded-2xl border border-slate-700/60">
+                        <h4 class="text-sm font-bold text-white mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-chart-line text-sky-400"></i> Grafik Volume ($V$) terhadap Waktu ($t$)
+                        </h4>
+                        <div class="h-56">
+                            <canvas id="p1ChartVt"></canvas>
+                        </div>
+                    </div>
+                    <div class="glass-card p-5 rounded-2xl border border-slate-700/60">
+                        <h4 class="text-sm font-bold text-white mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-chart-simple text-emerald-400"></i> Grafik Debit ($Q$) terhadap Luas Penampang ($A$)
+                        </h4>
+                        <div class="h-56">
+                            <canvas id="p1ChartQA"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 5: Analisis & Kesimpulan -->
+            <div id="p1-step-analisis" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Analisis Questions -->
+                <div class="glass-card p-6 rounded-2xl border border-slate-700/60 space-y-4">
+                    <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-magnifying-glass-chart text-sky-400"></i> Pertanyaan Analisis
+                    </h3>
+                    <div class="space-y-4 text-sm">
+                        <div>
+                            <label class="block text-slate-300 font-medium mb-1">1. Berdasarkan data eksperimen, bagaimana hubungan antara luas penampang pipa ($A$) dengan debit fluida ($Q$) pada kelajuan ($v$) tetap?</label>
+                            <textarea id="p1_ans_1" rows="2" class="w-full rounded-xl bg-slate-900 border border-slate-700 p-3 text-slate-200 text-xs focus:ring-sky-400 focus:border-sky-400" placeholder="Tuliskan analisis Anda..."></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-slate-300 font-medium mb-1">2. Bandingkan nilai $Q_{\text{teoretis}} = A \cdot v$ dengan $Q_{\text{eksperimen}} = V/t$. Apakah bernilai persis sama? Jelaskan alasannya.</label>
+                            <textarea id="p1_ans_2" rows="2" class="w-full rounded-xl bg-slate-900 border border-slate-700 p-3 text-slate-200 text-xs focus:ring-sky-400 focus:border-sky-400" placeholder="Tuliskan analisis Anda..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kesimpulan Box -->
+                <div class="glass-card p-6 rounded-2xl border border-slate-700/60 space-y-4 flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-lg font-bold text-white flex items-center gap-2 mb-3">
+                            <i class="fa-solid fa-award text-amber-400"></i> Kesimpulan Praktikum Pertemuan 1
+                        </h3>
+                        <p class="text-xs text-slate-400 mb-2">Tuliskan kesimpulan menyeluruh berdasarkan hubungan $Q, V, t, A,$ dan $v$:</p>
+                        <textarea id="p1_conclusion" rows="5" class="w-full rounded-xl bg-slate-900 border border-slate-700 p-3 text-slate-200 text-xs focus:ring-amber-400 focus:border-amber-400" placeholder="Simpulkan hasil eksperimen Anda di sini..."></textarea>
+                    </div>
+                    <button onclick="saveP1ReportSection()" class="w-full py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 font-semibold text-white transition text-sm">
+                        <i class="fa-solid fa-floppy-disk mr-1"></i> Simpan Hasil Pertemuan 1
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= PERTEMUAN 2: ASAS KONTINUITAS ================= -->
+        <section id="tab-p2" class="hidden space-y-6">
+            <!-- Progress Tracker Bar -->
+            <div class="glass-card p-4 rounded-2xl border border-slate-700/60 flex items-center justify-between overflow-x-auto">
+                <div class="flex items-center space-x-2 min-w-max">
+                    <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-blue-500/20 text-blue-300">Pertemuan 2</span>
+                    <h2 class="text-lg font-bold text-white">Asas Kontinuitas ($A_1 v_1 = A_2 v_2$)</h2>
+                </div>
+                <div class="flex items-center space-x-1 sm:space-x-3 text-xs font-medium text-slate-400 min-w-max ml-4">
+                    <button onclick="scrollToStep('p2-step-fenomena')" class="hover:text-blue-400">1. Fenomena</button> &rarr;
+                    <button onclick="scrollToStep('p2-step-prediksi')" class="hover:text-blue-400">2. Prediksi</button> &rarr;
+                    <button onclick="scrollToStep('p2-step-simulasi')" class="hover:text-blue-400">3. Eksperimen</button> &rarr;
+                    <button onclick="scrollToStep('p2-step-data')" class="hover:text-blue-400">4. Data & Grafik</button> &rarr;
+                    <button onclick="scrollToStep('p2-step-analisis')" class="hover:text-blue-400">5. Analisis</button>
+                </div>
+            </div>
+
+            <!-- Step 1: Fenomena -->
+            <div id="p2-step-fenomena" class="glass-card p-6 rounded-2xl border border-slate-700/60 space-y-4">
+                <div class="flex items-center gap-3 text-blue-400 font-bold text-lg">
+                    <div class="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center">1</div>
+                    <h3>Fenomena Awal: Perubahan Kecepatan pada Penyempitan Pipa Venturi</h3>
+                </div>
+                <p class="text-slate-300 text-sm leading-relaxed">
+                    Saat air mengalir dalam sistem jaringan pipa berdiameter berbeda (misalnya dari saluran utama yang lebar menuju saluran keran yang sempit), fluida ideal tidak dapat dimampatkan (*incompressible*). Menurut Anda, apa yang terjadi pada kerapatan partikel air dan kecepatannya saat memasuki bagian pipa yang lebih sempit?
+                </p>
+            </div>
+
+            <!-- Step 2: Prediksi -->
+            <div id="p2-step-prediksi" class="glass-card p-6 rounded-2xl border border-slate-700/60 space-y-4">
+                <div class="flex items-center gap-3 text-blue-400 font-bold text-lg">
+                    <div class="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center">2</div>
+                    <h3>Pertanyaan Prediksi</h3>
+                </div>
+                <div class="space-y-3 text-sm">
+                    <p class="text-slate-200">Jika luas penampang pipa kedua ($A_2$) hanya setengah dari luas penampang pipa pertama ($A_1$), bagaimana kelajuan aliran air pada pipa kedua ($v_2$)?</p>
+                    <div class="space-y-2 text-slate-300">
+                        <label class="flex items-center gap-2 cursor-pointer p-2 rounded-lg bg-slate-800/50 hover:bg-slate-800">
+                            <input type="radio" name="p2_pred" value="A" class="text-blue-500 focus:ring-blue-400">
+                            A. Kelajuan $v_2$ menjadi 2 kali lebih cepat dari $v_1$.
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer p-2 rounded-lg bg-slate-800/50 hover:bg-slate-800">
+                            <input type="radio" name="p2_pred" value="B" class="text-blue-500 focus:ring-blue-400">
+                            B. Kelajuan $v_2$ menjadi setengah kali dari $v_1$.
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer p-2 rounded-lg bg-slate-800/50 hover:bg-slate-800">
+                            <input type="radio" name="p2_pred" value="C" class="text-blue-500 focus:ring-blue-400">
+                            C. Kelajuan $v_2$ tetap sama persis dengan $v_1$.
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3: Simulation Engine for Continuity -->
+            <div id="p2-step-simulasi" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Controls -->
+                <div class="glass-card p-6 rounded-2xl border border-slate-700/60 space-y-5 lg:col-span-1">
+                    <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-sliders text-blue-400"></i> Variable Controls
+                    </h3>
+
+                    <!-- Slider A1 -->
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-sm">
+                            <label class="text-slate-300 font-medium">Luas Penampang 1 ($A_1$):</label>
+                            <span id="p2_val_A1" class="font-bold text-blue-400">20 cm²</span>
+                        </div>
+                        <input type="range" id="p2_slider_A1" min="10" max="40" step="1" value="20" oninput="updateP2Sim()" class="w-full accent-blue-400 cursor-pointer">
+                    </div>
+
+                    <!-- Slider v1 -->
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-sm">
+                            <label class="text-slate-300 font-medium">Kecepatan Masuk 1 ($v_1$):</label>
+                            <span id="p2_val_v1" class="font-bold text-blue-400">2.0 m/s</span>
+                        </div>
+                        <input type="range" id="p2_slider_v1" min="0.5" max="5.0" step="0.1" value="2.0" oninput="updateP2Sim()" class="w-full accent-blue-400 cursor-pointer">
+                    </div>
+
+                    <!-- Slider A2 -->
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-sm">
+                            <label class="text-slate-300 font-medium">Luas Penampang 2 ($A_2$):</label>
+                            <span id="p2_val_A2" class="font-bold text-cyan-400">10 cm²</span>
+                        </div>
+                        <input type="range" id="p2_slider_A2" min="5" max="30" step="1" value="10" oninput="updateP2Sim()" class="w-full accent-cyan-400 cursor-pointer">
+                    </div>
+
+                    <!-- Metrics calculated -->
+                    <div class="p-4 rounded-xl bg-slate-800/80 border border-slate-700 space-y-2 text-xs">
+                        <div class="flex justify-between">
+                            <span class="text-slate-400">Debit Pipa 1 ($Q_1$):</span>
+                            <span id="p2_metric_Q1" class="font-bold text-blue-300">0.0040 m³/s</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-400">Kecepatan Pipa 2 ($v_2$):</span>
+                            <span id="p2_metric_v2" class="font-bold text-amber-400">4.00 m/s</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-400">Debit Pipa 2 ($Q_2$):</span>
+                            <span id="p2_metric_Q2" class="font-bold text-emerald-400">0.0040 m³/s</span>
+                        </div>
+                    </div>
+
+                    <!-- Action buttons -->
+                    <div class="grid grid-cols-2 gap-2 pt-2">
+                        <button onclick="resetP2Sim()" class="py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs border border-slate-700 transition">
+                            <i class="fa-solid fa-rotate-left mr-1"></i> Reset
+                        </button>
+                        <button onclick="recordP2Data()" class="py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs shadow-md shadow-blue-600/30 transition">
+                            <i class="fa-solid fa-plus mr-1"></i> Catat Data
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Interactive Pipe Canvas -->
+                <div class="glass-card p-6 rounded-2xl border border-slate-700/60 lg:col-span-2 flex flex-col justify-between">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-water text-blue-400"></i> Visualisasi Aliran Pipa Bertingkat (Besar &rarr; Sempit)
+                        </h3>
+                        <span class="text-xs text-slate-400">Kecepatan aliran diwakili kelajuan garis partikel</span>
+                    </div>
+                    <div class="relative w-full h-72 sm:h-80 bg-slate-950 rounded-xl border border-slate-800 overflow-hidden">
+                        <canvas id="p2Canvas" class="w-full h-full block"></canvas>
+                    </div>
+                    <div class="mt-3 text-xs text-slate-400 text-center">
+                        *Hukum Kontinuitas:<div class="math-display">$$A_1v_1=A_2v_2=Q$$</div><div class="text-xs">Debit konstan pada fluida inkompresibel.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 4: Data Table & Charts -->
+            <div id="p2-step-data" class="space-y-6">
+                <!-- Data Table -->
+                <div class="glass-card p-6 rounded-2xl border border-slate-700/60 space-y-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-table text-blue-400"></i> Tabel Pengamatan Persamaan Kontinuitas
+                        </h3>
+                        <button onclick="clearP2Data()" class="px-3 py-1.5 rounded-lg bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs font-semibold hover:bg-rose-500/20 transition self-start sm:self-auto">
+                            <i class="fa-solid fa-trash mr-1"></i> Hapus Semua Data
+                        </button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs sm:text-sm text-slate-300">
+                            <thead class="bg-slate-800/80 text-blue-400 uppercase text-xs">
+                                <tr>
+                                    <th class="p-3 rounded-l-lg">No</th>
+                                    <th class="p-3">A1 (cm²)</th>
+                                    <th class="p-3">v1 (m/s)</th>
+                                    <th class="p-3">Q1 (m³/s)</th>
+                                    <th class="p-3">A2 (cm²)</th>
+                                    <th class="p-3">v2 (m/s)</th>
+                                    <th class="p-3">Q2 (m³/s)</th>
+                                    <th class="p-3 rounded-r-lg">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="p2TableBody" class="divide-y divide-slate-800">
+                                <tr>
+                                    <td colspan="8" class="p-4 text-center text-slate-500">Belum ada data dicatat. Atur slider lalu klik "Catat Data".</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Charts Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="glass-card p-5 rounded-2xl border border-slate-700/60">
+                        <h4 class="text-sm font-bold text-white mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-chart-area text-blue-400"></i> Grafik Rasio Luas Penampang ($A_1/A_2$) vs $v_2$
+                        </h4>
+                        <div class="h-56">
+                            <canvas id="p2ChartAv"></canvas>
+                        </div>
+                    </div>
+                    <div class="glass-card p-5 rounded-2xl border border-slate-700/60">
+                        <h4 class="text-sm font-bold text-white mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-chart-column text-cyan-400"></i> Grafik Perbandingan Debit $Q_1$ dan $Q_2$
+                        </h4>
+                        <div class="h-56">
+                            <canvas id="p2ChartQ1Q2"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 5: Analisis & Kesimpulan -->
+            <div id="p2-step-analisis" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="glass-card p-6 rounded-2xl border border-slate-700/60 space-y-4">
+                    <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-magnifying-glass-chart text-blue-400"></i> Pertanyaan Analisis Kontinuitas
+                    </h3>
+                    <div class="space-y-4 text-sm">
+                        <div>
+                            <label class="block text-slate-300 font-medium mb-1">1. Mengapa kecepatan fluida ($v_2$) meningkat saat fluida memasuki luas penampang yang lebih kecil ($A_2$)? Jelaskan secara fisis.</label>
+                            <textarea id="p2_ans_1" rows="2" class="w-full rounded-xl bg-slate-900 border border-slate-700 p-3 text-slate-200 text-xs focus:ring-blue-400 focus:border-blue-400" placeholder="Jawaban analisis..."></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-slate-300 font-medium mb-1">2. Apakah data $Q_1$ dan $Q_2$ pada tabel membuktikan bahwa debit fluida ideal bernilai konstan sepanjang saluran? Berikan bukti angka.</label>
+                            <textarea id="p2_ans_2" rows="2" class="w-full rounded-xl bg-slate-900 border border-slate-700 p-3 text-slate-200 text-xs focus:ring-blue-400 focus:border-blue-400" placeholder="Jawaban analisis..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-card p-6 rounded-2xl border border-slate-700/60 space-y-4 flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-lg font-bold text-white flex items-center gap-2 mb-3">
+                            <i class="fa-solid fa-award text-amber-400"></i> Kesimpulan Pertemuan 2
+                        </h3>
+                        <textarea id="p2_conclusion" rows="5" class="w-full rounded-xl bg-slate-900 border border-slate-700 p-3 text-slate-200 text-xs focus:ring-amber-400 focus:border-amber-400" placeholder="Tuliskan kesimpulan hukum kontinuitas Anda..."></textarea>
+                    </div>
+                    <button onclick="saveP2ReportSection()" class="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 font-semibold text-white transition text-sm">
+                        <i class="fa-solid fa-floppy-disk mr-1"></i> Simpan Hasil Pertemuan 2
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= PERTEMUAN 3: PERSAMAAN BERNOULLI ================= -->
+        <section id="tab-p3" class="hidden space-y-6">
+            <!-- Progress Tracker Bar -->
+            <div class="glass-card p-4 rounded-2xl border border-slate-700/60 flex items-center justify-between overflow-x-auto">
+                <div class="flex items-center space-x-2 min-w-max">
+                    <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-indigo-500/20 text-indigo-300">Pertemuan 3</span>
+                    <h2 class="text-lg font-bold text-white">Persamaan Bernoulli ($P + \frac{1}{2}\rho v^2 + \rho g h = \text{Konstan}$)</h2>
+                </div>
+                <div class="flex items-center space-x-1 sm:space-x-3 text-xs font-medium text-slate-400 min-w-max ml-4">
+                    <button onclick="scrollToStep('p3-step-fenomena')" class="hover:text-indigo-400">1. Fenomena</button> &rarr;
+                    <button onclick="scrollToStep('p3-step-prediksi')" class="hover:text-indigo-400">2. Prediksi</button> &rarr;
+                    <button onclick="scrollToStep('p3-step-simulasi')" class="hover:text-indigo-400">3. Eksperimen</button> &rarr;
+                    <button onclick="scrollToStep('p3-step-data')" class="hover:text-indigo-400">4. Data & Grafik</button> &rarr;
+                    <button onclick="scrollToStep('p3-step-analisis')" class="hover:text-indigo-400">5. Analisis</button>
+                </div>
+            </div>
+
+            <!-- Step 1: Fenomena -->
+            <div id="p3-step-fenomena" class="glass-card p-6 rounded-2xl border border-slate-700/60 space-y-4">
+                <div class="flex items-center gap-3 text-indigo-400 font-bold text-lg">
+                    <div class="w-8 h-8 rounded-lg bg-indigo-500/20 flex items-center justify-center">1</div>
+                    <h3>Fenomena Awal: Hubungan Antara Kecepatan Aliran, Ketinggian, dan Tekanan Fluida</h3>
+                </div>
+                <p class="text-slate-300 text-sm leading-relaxed">
+                    Mengapa terpal mobil bak terbuka terangkat naik saat mobil melaju kencang? Mengapa pipa penyemprot parfum cair dapat menyedot cairan ke atas ketika dihembuskan udara cepat? Semua fenomena ini merupakan konsekuensi langsung dari Hukum Kekekalan Energi pada Fluida Bergerak (Persamaan Bernoulli).
+                </p>
+            </div>
+
+            <!-- Step 2: Prediksi -->
+            <div id="p3-step-prediksi" class="glass-card p-6 rounded-2xl border border-slate-700/60 space-y-4">
+                <div class="flex items-center gap-3 text-indigo-400 font-bold text-lg">
+                    <div class="w-8 h-8 rounded-lg bg-indigo-500/20 flex items-center justify-center">2</div>
+                    <h3>Pertanyaan Prediksi</h3>
+                </div>
+                <div class="space-y-3 text-sm">
+                    <p class="text-slate-200">Pada pipa horizontal ($h_1 = h_2$), jika kecepatan aliran air bertambah tinggi pada bagian pipa yang sempit, bagaimana nilai tekanan fluida ($P_2$) di daerah sempit tersebut?</p>
+                    <div class="space-y-2 text-slate-300">
+                        <label class="flex items-center gap-2 cursor-pointer p-2 rounded-lg bg-slate-800/50 hover:bg-slate-800">
+                            <input type="radio" name="p3_pred" value="A" class="text-indigo-500 focus:ring-indigo-400">
+                            A. Tekanan $P_2$ justru akan berkurang (menjadi lebih kecil daripada $P_1$).
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer p-2 rounded-lg bg-slate-800/50 hover:bg-slate-800">
+                            <input type="radio" name="p3_pred" value="B" class="text-indigo-500 focus:ring-indigo-400">
+                            B. Tekanan $P_2$ akan bertambah besar karena didorong oleh kecepatan.
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer p-2 rounded-lg bg-slate-800/50 hover:bg-slate-800">
+                            <input type="radio" name="p3_pred" value="C" class="text-indigo-500 focus:ring-indigo-400">
+                            C. Tekanan $P_2$ selalu sama tanpa terpengaruh kelajuan fluida.
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mode Selector for Bernoulli -->
+            <div class="flex flex-wrap gap-2">
+                <button onclick="setP3Mode('A')" id="btn-mode-A" class="px-4 py-2 rounded-xl text-xs font-bold transition bg-indigo-600 text-white shadow-lg shadow-indigo-600/30">
+                    Mode A: Kecepatan vs Tekanan (Ketinggian Sama $h_1=h_2$)
+                </button>
+                <button onclick="setP3Mode('B')" id="btn-mode-B" class="px-4 py-2 rounded-xl text-xs font-bold transition bg-slate-800 text-slate-300 border border-slate-700 hover:bg-slate-700">
+                    Mode B: Ketinggian Pipa vs Tekanan ($h_1 \neq h_2$)
+                </button>
+                <button onclick="setP3Mode('C')" id="btn-mode-C" class="px-4 py-2 rounded-xl text-xs font-bold transition bg-slate-800 text-slate-300 border border-slate-700 hover:bg-slate-700">
+                    Mode C: Keseimbangan Energi Total ($E_{\text{tekanan}} + E_k + E_p$)
+                </button>
+            </div>
+
+            <!-- Step 3: Simulation Engine for Bernoulli -->
+            <div id="p3-step-simulasi" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Controls Panel -->
+                <div class="glass-card p-6 rounded-2xl border border-slate-700/60 space-y-4 lg:col-span-1">
+                    <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-sliders text-indigo-400"></i> Kontrol Bernoulli
+                    </h3>
+
+                    <!-- Inputs Titik 1 -->
+                    <div class="p-3 rounded-xl bg-slate-800/60 border border-slate-700 space-y-3">
+                        <div class="text-xs font-bold text-indigo-300 uppercase">Kondisi Titik 1 (Pipa Awal)</div>
+                        <div class="space-y-1">
+                            <div class="flex justify-between text-xs">
+                                <span>Tekanan $P_1$:</span>
+                                <span id="p3_val_P1" class="font-bold text-indigo-400">150 kPa</span>
+                            </div>
+                            <input type="range" id="p3_slider_P1" min="100" max="250" step="5" value="150" oninput="updateP3Sim()" class="w-full accent-indigo-400">
+                        </div>
+                        <div class="space-y-1">
+                            <div class="flex justify-between text-xs">
+                                <span>Kecepatan $v_1$:</span>
+                                <span id="p3_val_v1" class="font-bold text-indigo-400">2.0 m/s</span>
+                            </div>
+                            <input type="range" id="p3_slider_v1" min="0.5" max="4.0" step="0.1" value="2.0" oninput="updateP3Sim()" class="w-full accent-indigo-400">
+                        </div>
+                        <div class="space-y-1">
+                            <div class="flex justify-between text-xs">
+                                <span>Ketinggian $h_1$:</span>
+                                <span id="p3_val_h1" class="font-bold text-indigo-400">0.0 m</span>
+                            </div>
+                            <input type="range" id="p3_slider_h1" min="0" max="10" step="0.5" value="0" oninput="updateP3Sim()" class="w-full accent-indigo-400">
+                        </div>
+                    </div>
+
+                    <!-- Inputs Titik 2 -->
+                    <div class="p-3 rounded-xl bg-slate-800/60 border border-slate-700 space-y-3">
+                        <div class="text-xs font-bold text-cyan-300 uppercase">Kondisi Titik 2 (Pipa Pengamatan)</div>
+                        <div class="space-y-1">
+                            <div class="flex justify-between text-xs">
+                                <span>Luas $A_1 / A_2$:</span>
+                                <span id="p3_val_A2_ratio" class="font-bold text-cyan-400">2.0x Sempit</span>
+                            </div>
+                            <input type="range" id="p3_slider_A2_ratio" min="0.5" max="3.0" step="0.1" value="2.0" oninput="updateP3Sim()" class="w-full accent-cyan-400">
+                        </div>
+                        <div class="space-y-1">
+                            <div class="flex justify-between text-xs">
+                                <span>Ketinggian $h_2$:</span>
+                                <span id="p3_val_h2" class="font-bold text-cyan-400">0.0 m</span>
+                            </div>
+                            <input type="range" id="p3_slider_h2" min="0" max="10" step="0.5" value="0" oninput="updateP3Sim()" class="w-full accent-cyan-400">
+                        </div>
+                    </div>
+
+                    <!-- Computed Results for Point 2 -->
+                    <div class="p-4 rounded-xl bg-slate-800/90 border border-indigo-500/30 space-y-1.5 text-xs">
+                        <div class="flex justify-between">
+                            <span class="text-slate-400">Kecepatan $v_2$:</span>
+                            <span id="p3_metric_v2" class="font-bold text-amber-300">4.00 m/s</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-400">Tekanan $P_2$:</span>
+                            <span id="p3_metric_P2" class="font-bold text-emerald-400">144.00 kPa</span>
+                        </div>
+                        <div class="flex justify-between border-t border-slate-700 pt-1 mt-1">
+                            <span class="text-slate-400">Massa Jenis Air ($\rho$):</span>
+                            <span class="font-bold text-slate-200">1000 kg/m³</span>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2">
+                        <button onclick="resetP3Sim()" class="py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs border border-slate-700 transition">
+                            <i class="fa-solid fa-rotate-left mr-1"></i> Reset
+                        </button>
+                        <button onclick="recordP3Data()" class="py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs shadow-md shadow-indigo-600/30 transition">
+                            <i class="fa-solid fa-plus mr-1"></i> Catat Data
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Simulation Visual Canvas and Energy Chart -->
+                <div class="glass-card p-6 rounded-2xl border border-slate-700/60 lg:col-span-2 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-gauge-high text-indigo-400"></i> Visualisasi Pipa Menanjak & Manometer Tekanan
+                        </h3>
+                    <div id="p3EquationDisplay" class="equation-card text-slate-100">
+                        <div class="math-display">$$P_1+\frac{1}{2}\rho v_1^2+\rho gh_1
+                        =P_2+\frac{1}{2}\rho v_2^2+\rho gh_2$$</div>
+                    </div>
+                        <span class="text-xs text-slate-400">Garis manometer menunjukkan tinggi tekanan relatif</span>
+                    </div>
+
+                    <div class="relative w-full h-64 bg-slate-950 rounded-xl border border-slate-800 overflow-hidden">
+                        <canvas id="p3Canvas" class="w-full h-full block"></canvas>
+                    </div>
+
+                    <!-- Energy Components Stacked Distribution -->
+                    <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+                        <div class="text-xs font-bold text-slate-300 flex justify-between">
+                            <span>Komponen Energi Per Satuan Volume ($J/\text{m}^3$)</span>
+                            <span id="p3_metric_energy_total" class="text-indigo-400 font-mono">Total = 152.0 kJ/m³</span>
+                        </div>
+                        <div class="h-6 w-full bg-slate-800 rounded-lg overflow-hidden flex">
+                            <div id="p3_bar_press" class="bg-indigo-500 h-full transition-all duration-300" style="width: 80%" title="Energi Tekanan P"></div>
+                            <div id="p3_bar_kin" class="bg-amber-400 h-full transition-all duration-300" style="width: 10%" title="Energi Kinetik 1/2 ρ v²"></div>
+                            <div id="p3_bar_pot" class="bg-emerald-500 h-full transition-all duration-300" style="width: 10%" title="Energi Potensial ρ g h"></div>
+                        </div>
+                        <div class="flex justify-between text-[10px] text-slate-400">
+                            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 bg-indigo-500 rounded-sm"></span> Tekanan ($P$)</span>
+                            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 bg-amber-400 rounded-sm"></span> Kinetik ($\frac{1}{2}\rho v^2$)</span>
+                            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 bg-emerald-500 rounded-sm"></span> Potensial ($\rho g h$)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 4: Data Table & Charts -->
+            <div id="p3-step-data" class="space-y-6">
+                <div class="glass-card p-6 rounded-2xl border border-slate-700/60 space-y-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-table text-indigo-400"></i> Tabel Pengamatan Persamaan Bernoulli
+                        </h3>
+                        <button onclick="clearP3Data()" class="px-3 py-1.5 rounded-lg bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs font-semibold hover:bg-rose-500/20 transition self-start sm:self-auto">
+                            <i class="fa-solid fa-trash mr-1"></i> Hapus Semua Data
+                        </button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs sm:text-sm text-slate-300">
+                            <thead class="bg-slate-800/80 text-indigo-400 uppercase text-xs">
+                                <tr>
+                                    <th class="p-3 rounded-l-lg">No</th>
+                                    <th class="p-3">P1 (kPa)</th>
+                                    <th class="p-3">v1 (m/s)</th>
+                                    <th class="p-3">h1 (m)</th>
+                                    <th class="p-3">P2 (kPa)</th>
+                                    <th class="p-3">v2 (m/s)</th>
+                                    <th class="p-3">h2 (m)</th>
+                                    <th class="p-3">E Total (kJ/m³)</th>
+                                    <th class="p-3 rounded-r-lg">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="p3TableBody" class="divide-y divide-slate-800">
+                                <tr>
+                                    <td colspan="9" class="p-4 text-center text-slate-500">Belum ada data dicatat. Atur variabel lalu klik "Catat Data".</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Charts Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="glass-card p-5 rounded-2xl border border-slate-700/60">
+                        <h4 class="text-sm font-bold text-white mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-chart-line text-indigo-400"></i> Grafik Tekanan $P_2$ vs Kecepatan $v_2$
+                        </h4>
+                        <div class="h-56">
+                            <canvas id="p3ChartPv"></canvas>
+                        </div>
+                    </div>
+                    <div class="glass-card p-5 rounded-2xl border border-slate-700/60">
+                        <h4 class="text-sm font-bold text-white mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-chart-area text-emerald-400"></i> Grafik Tekanan $P_2$ vs Ketinggian $h_2$
+                        </h4>
+                        <div class="h-56">
+                            <canvas id="p3ChartPh"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 5: Analisis & Kesimpulan -->
+            <div id="p3-step-analisis" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="glass-card p-6 rounded-2xl border border-slate-700/60 space-y-4">
+                    <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-magnifying-glass-chart text-indigo-400"></i> Pertanyaan Analisis Bernoulli
+                    </h3>
+                    <div class="space-y-4 text-sm">
+                        <div>
+                            <label class="block text-slate-300 font-medium mb-1">1. Pada ketinggian sejajar ($h_1 = h_2$), bagaimana pengaruh peningkatan kelajuan aliran ($v_2$) terhadap besarnya tekanan fluida ($P_2$)? Mengapa demikian?</label>
+                            <textarea id="p3_ans_1" rows="2" class="w-full rounded-xl bg-slate-900 border border-slate-700 p-3 text-slate-200 text-xs focus:ring-indigo-400 focus:border-indigo-400" placeholder="Jawaban analisis..."></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-slate-300 font-medium mb-1">2. Jelaskan bagaimana Hukum Kekekalan Energi Mekanik berlaku dalam Persamaan Bernoulli berdasarkan diagram komponen energi total.</label>
+                            <textarea id="p3_ans_2" rows="2" class="w-full rounded-xl bg-slate-900 border border-slate-700 p-3 text-slate-200 text-xs focus:ring-indigo-400 focus:border-indigo-400" placeholder="Jawaban analisis..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-card p-6 rounded-2xl border border-slate-700/60 space-y-4 flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-lg font-bold text-white flex items-center gap-2 mb-3">
+                            <i class="fa-solid fa-award text-amber-400"></i> Kesimpulan Pertemuan 3
+                        </h3>
+                        <textarea id="p3_conclusion" rows="5" class="w-full rounded-xl bg-slate-900 border border-slate-700 p-3 text-slate-200 text-xs focus:ring-amber-400 focus:border-amber-400" placeholder="Tuliskan kesimpulan persamaan Bernoulli Anda..."></textarea>
+                    </div>
+                    <button onclick="saveP3ReportSection()" class="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 font-semibold text-white transition text-sm">
+                        <i class="fa-solid fa-floppy-disk mr-1"></i> Simpan Hasil Pertemuan 3
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= TANTANGAN EKSPERIMEN ================= -->
+        <section id="tab-tantangan" class="hidden space-y-6">
+            <div class="glass-card p-6 rounded-2xl border border-slate-700/60 space-y-2">
+                <h2 class="text-2xl font-bold text-white flex items-center gap-3">
+                    <i class="fa-solid fa-trophy text-amber-400"></i> Challenge Mode (Tantangan Eksperimen)
+                </h2>
+                <p class="text-slate-300 text-sm">
+                    Uji pemahaman analitis Anda dengan menyelesaikan skenario permasalahan fluida dinamis berikut. Tentukan parameter fisik yang tepat!
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Level 1 -->
+                <div class="glass-card p-6 rounded-2xl border border-slate-700/60 space-y-4 flex flex-col justify-between">
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center">
+                            <span class="px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-300 text-xs font-bold">Level 1: Debit Target</span>
+                            <span id="ch1_status" class="text-xs text-slate-400">Belum Selesai</span>
+                        </div>
+                        <h3 class="font-bold text-white text-base">Tantangan Debit $Q = 0.005\text{ m}^3/\text{s}$</h3>
+                        <p class="text-xs text-slate-300 leading-relaxed">
+                            Atur kombinasi Luas Penampang ($A$) dan Kecepatan ($v$) agar menghasilkan debit persis <strong>0.005 m³/s</strong> ($5\text{ Liter/detik}$).
+                        </p>
+                        <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 space-y-2 text-xs">
+                            <div class="flex justify-between">
+                                <span>Input A (cm²):</span>
+                                <input type="number" id="ch1_in_A" class="w-20 px-2 py-1 rounded bg-slate-800 border border-slate-700 text-white text-center" value="25">
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Input v (m/s):</span>
+                                <input type="number" id="ch1_in_v" class="w-20 px-2 py-1 rounded bg-slate-800 border border-slate-700 text-white text-center" step="0.1" value="1.0">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="space-y-2 pt-2">
+                        <button onclick="checkChallenge1()" class="w-full py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs transition">
+                            Uji Jawaban Tantangan 1
+                        </button>
+                        <p id="ch1_feedback" class="text-[11px] text-slate-400 text-center min-h-[1.5rem]"></p>
+                    </div>
+                </div>
+
+                <!-- Level 2 -->
+                <div class="glass-card p-6 rounded-2xl border border-slate-700/60 space-y-4 flex flex-col justify-between">
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center">
+                            <span class="px-2.5 py-1 rounded-full bg-blue-500/20 text-blue-300 text-xs font-bold">Level 2: Kecepatan Kontinuitas</span>
+                            <span id="ch2_status" class="text-xs text-slate-400">Belum Selesai</span>
+                        </div>
+                        <h3 class="font-bold text-white text-base">Prediksi Kelajuan $v_2$</h3>
+                        <p class="text-xs text-slate-300 leading-relaxed">
+                            Pipa 1 berpenampang $A_1 = 30\text{ cm}^2$ dialiri air berkecepatan $v_1 = 2.0\text{ m/s}$. Jika pipa menyempit menjadi $A_2 = 12\text{ cm}^2$, berapakah kelajuan $v_2$?
+                        </p>
+                        <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 space-y-2 text-xs">
+                            <div class="flex justify-between items-center">
+                                <span>Jawaban $v_2$ (m/s):</span>
+                                <input type="number" id="ch2_in_v2" class="w-24 px-2 py-1 rounded bg-slate-800 border border-slate-700 text-white text-center" step="0.1" placeholder="0.0">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="space-y-2 pt-2">
+                        <button onclick="checkChallenge2()" class="w-full py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs transition">
+                            Uji Jawaban Tantangan 2
+                        </button>
+                        <p id="ch2_feedback" class="text-[11px] text-slate-400 text-center min-h-[1.5rem]"></p>
+                    </div>
+                </div>
+
+                <!-- Level 3 -->
+                <div class="glass-card p-6 rounded-2xl border border-slate-700/60 space-y-4 flex flex-col justify-between">
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center">
+                            <span class="px-2.5 py-1 rounded-full bg-indigo-500/20 text-indigo-300 text-xs font-bold">Level 3: Tekanan Bernoulli</span>
+                            <span id="ch3_status" class="text-xs text-slate-400">Belum Selesai</span>
+                        </div>
+                        <h3 class="font-bold text-white text-base">Hitung Tekanan $P_2$ pada Pipa yang Naik</h3>
+                        <p class="text-xs text-slate-300 leading-relaxed">
+                            Jika $P_1 = 150\text{ kPa}$, $v_1 = 2.0\text{ m/s}$, dan pipa dinaikkan sejauh $h_2 - h_1 = 2.0\text{ m}$ tanpa perubahan penampang ($v_2 = v_1$), berapakah tekanan $P_2$ yang terukur dalam kPa?
+                        </p>
+                        <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 space-y-2 text-xs">
+                            <div class="flex justify-between items-center">
+                                <span>Jawaban $P_2$ (kPa):</span>
+                                <input type="number" id="ch3_in_P2" class="w-24 px-2 py-1 rounded bg-slate-800 border border-slate-700 text-white text-center" step="0.1" placeholder="0.0">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="space-y-2 pt-2">
+                        <button onclick="checkChallenge3()" class="w-full py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs transition">
+                            Uji Jawaban Tantangan 3
+                        </button>
+                        <p id="ch3_feedback" class="text-[11px] text-slate-400 text-center min-h-[1.5rem]"></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= EVALUASI AKHIR ================= -->
+        <section id="tab-evaluasi" class="hidden space-y-6">
+            <div class="glass-card p-6 rounded-2xl border border-slate-700/60 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-white flex items-center gap-3">
+                        <i class="fa-solid fa-list-check text-emerald-400"></i> Evaluasi Pemahaman Fluida Dinamis
+                    </h2>
+                    <p class="text-slate-300 text-sm mt-1">10 Soal Pilihan Ganda Konseptual, Grafik, dan Perhitungan Sederhana</p>
+                </div>
+                <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 text-center">
+                    <div class="text-xs text-slate-400">Skor Terakhir</div>
+                    <div id="quizScoreDisplay" class="text-2xl font-extrabold text-emerald-400">0 / 100</div>
+                </div>
+            </div>
+
+            <!-- Quiz Questions Container -->
+            <div id="quizContainer" class="space-y-6">
+                <!-- Dynamic Quiz Content Rendered via JavaScript -->
+            </div>
+
+            <div class="flex justify-end gap-3 pt-4">
+                <button onclick="submitQuiz()" class="px-8 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold shadow-lg shadow-emerald-600/30 transition">
+                    <i class="fa-solid fa-paper-plane mr-2"></i> Kumpulkan & Hitung Nilai
+                </button>
+            </div>
+        </section>
+
+        <!-- ================= LAPORAN PRAKTIKUM ================= -->
+        <section id="tab-laporan" class="hidden space-y-6">
+            <div class="glass-card p-6 rounded-2xl border border-slate-700/60 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 no-print">
+                <div>
+                    <h2 class="text-2xl font-bold text-white flex items-center gap-3">
+                        <i class="fa-solid fa-file-invoice text-purple-400"></i> Laporan Resmi Praktikum Virtual
+                    </h2>
+                    <p class="text-slate-300 text-sm mt-1">Laporan terintegrasi otomatis berisi identitas, data eksperimen, jawaban analisis, dan nilai evaluasi.</p>
+                </div>
+                <button onclick="window.print()" class="px-6 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold shadow-lg shadow-purple-600/30 transition flex items-center gap-2">
+                    <i class="fa-solid fa-print"></i> Cetak PDF Laporan
+                </button>
+            </div>
+
+            <!-- Printable Document Body -->
+            <div id="printableReportCard" class="glass-card p-8 rounded-2xl border border-slate-700/60 space-y-8 text-slate-200">
+                <!-- Header Laporan -->
+                <div class="border-b border-slate-700 pb-6 flex justify-between items-start">
+                    <div>
+                        <h1 class="text-2xl font-bold text-white tracking-wide">LAPORAN PRAKTIKUM FISIKA VIRTUAL</h1>
+                        <h2 class="text-lg font-semibold text-sky-400">Topik Utama: Fluida Dinamis</h2>
+                        <p class="text-xs text-slate-400 mt-1">Tanggal Cetak: <span id="reportPrintDate">07 Oktober 2026</span></p>
+                    </div>
+                    <div class="text-right text-xs text-slate-300 space-y-1">
+                        <div><strong>Nama Siswa:</strong> <span id="repStudentName">-</span></div>
+                        <div><strong>Kelas / NIS:</strong> <span id="repStudentClass">-</span></div>
+                        <div><strong>Sekolah:</strong> <span id="repStudentSchool">-</span></div>
+                    </div>
+                </div>
+
+                <!-- Bagian 1: Debit Fluida -->
+                <div class="space-y-3">
+                    <h3 class="text-base font-bold text-sky-400 border-l-4 border-sky-500 pl-3 uppercase">I. Pertemuan 1: Debit Fluida</h3>
+                    <div class="text-xs space-y-2">
+                        <div><strong>Prediksi Hipotesis Siswa:</strong> <span id="repP1Pred">-</span></div>
+                        <div>
+                            <strong>Ringkasan Data Percobaan:</strong>
+                            <div id="repP1Table" class="mt-2 overflow-x-auto">
+                                <!-- Dynamic Mini Table -->
+                            </div>
+                        </div>
+                        <div><strong>Analisis & Kesimpulan:</strong> <p id="repP1Conc" class="italic text-slate-300 bg-slate-900/50 p-3 rounded-lg border border-slate-800 mt-1">-</p></div>
+                    </div>
+                </div>
+
+                <!-- Bagian 2: Kontinuitas -->
+                <div class="space-y-3">
+                    <h3 class="text-base font-bold text-blue-400 border-l-4 border-blue-500 pl-3 uppercase">II. Pertemuan 2: Asas Kontinuitas</h3>
+                    <div class="text-xs space-y-2">
+                        <div><strong>Prediksi Hipotesis Siswa:</strong> <span id="repP2Pred">-</span></div>
+                        <div>
+                            <strong>Ringkasan Data Percobaan:</strong>
+                            <div id="repP2Table" class="mt-2 overflow-x-auto"></div>
+                        </div>
+                        <div><strong>Analisis & Kesimpulan:</strong> <p id="repP2Conc" class="italic text-slate-300 bg-slate-900/50 p-3 rounded-lg border border-slate-800 mt-1">-</p></div>
+                    </div>
+                </div>
+
+                <!-- Bagian 3: Bernoulli -->
+                <div class="space-y-3">
+                    <h3 class="text-base font-bold text-indigo-400 border-l-4 border-indigo-500 pl-3 uppercase">III. Pertemuan 3: Persamaan Bernoulli</h3>
+                    <div class="text-xs space-y-2">
+                        <div><strong>Prediksi Hipotesis Siswa:</strong> <span id="repP3Pred">-</span></div>
+                        <div>
+                            <strong>Ringkasan Data Percobaan:</strong>
+                            <div id="repP3Table" class="mt-2 overflow-x-auto"></div>
+                        </div>
+                        <div><strong>Analisis & Kesimpulan:</strong> <p id="repP3Conc" class="italic text-slate-300 bg-slate-900/50 p-3 rounded-lg border border-slate-800 mt-1">-</p></div>
+                    </div>
+                </div>
+
+                <!-- Bagian 4: Skor Evaluasi Akhir -->
+                <div class="border-t border-slate-700 pt-4 flex justify-between items-center text-xs">
+                    <div>
+                        <strong>Hasil Evaluasi Akhir:</strong> <span id="repQuizScore" class="font-bold text-emerald-400 text-sm">0 / 100</span>
+                    </div>
+                    <div class="text-center w-48 border-t border-slate-600 pt-8 mt-4">
+                        <p class="font-semibold text-slate-300">Tanda Tangan Guru Fisika</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Profile Modal -->
+    <div id="profileModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="glass-card p-6 rounded-2xl max-w-md w-full border border-slate-700 space-y-4">
+            <h3 class="text-xl font-bold text-white flex items-center gap-2">
+                <i class="fa-solid fa-id-card text-sky-400"></i> Identitas Praktikan
+            </h3>
+            <div class="space-y-3 text-sm">
+                <div>
+                    <label class="block text-slate-300 mb-1">Nama Lengkap Siswa:</label>
+                    <input type="text" id="inStudentName" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white" placeholder="Contoh: Budi Santoso">
+                </div>
+                <div>
+                    <label class="block text-slate-300 mb-1">Kelas / Nomor Absen:</label>
+                    <input type="text" id="inStudentClass" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white" placeholder="Contoh: XI MIPA 1 / 08">
+                </div>
+                <div>
+                    <label class="block text-slate-300 mb-1">Nama Sekolah:</label>
+                    <input type="text" id="inStudentSchool" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white" placeholder="Contoh: SMAN 1 Bandung">
+                </div>
+            </div>
+            <div class="flex justify-end gap-2 pt-2">
+                <button onclick="closeProfileModal()" class="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 text-xs font-semibold hover:bg-slate-700">Batal</button>
+                <button onclick="saveProfile()" class="px-5 py-2 rounded-xl bg-sky-500 text-white text-xs font-bold hover:bg-sky-400">Simpan Identitas</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Skrip aplikasi (urutan penting) -->
+    <script src="js/audio.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/simulasi.js"></script>
+    <script src="js/evaluasi.js"></script>
+</body>
+</html>
